@@ -1,1 +1,97 @@
+#1. Title of Database: Abalone data
+
+#2. Sources:
+  Original owners of database:
+	Marine Resources Division
+	Marine Research Laboratories - Taroona
+	Department of Primary Industry and Fisheries, Tasmania
+	GPO Box 619F, Hobart, Tasmania 7001, Australia
+	(contact: Warwick Nash +61 02 277277, wnash@dpi.tas.gov.au)
+
+  Donor of database:
+	Sam Waugh (Sam.Waugh@cs.utas.edu.au)
+	Department of Computer Science, University of Tasmania
+	GPO Box 252C, Hobart, Tasmania 7001, Australia
+
+###############################################################
+
+
+# Looking at the dataset we can see that there are 8 numerical variables(Length, Diameter, Height, Whole Weight, Shucked Weight, Viscera Weight, ShellWeight) and one categorical(sex) describing each observation.
+Most of the 'Rings' values (our target) is in the range from 5 to 15
+
+# There are 2 observations with Height=0, which is impossible, so that observations due to the missing data will be excluded from the dataset.
+
+# It's obvious that the `Whole_weight` should be the linear function of variables `Shucked_weight`, `Viscersa_weight` and `Shell_weight` and should be bigger than their sum. 
+Althought some of observations doesn't fulfill that condiition, which seems illogical, so probably they shouldn't be taken into account to avoid confusion of the learning algorithm.
+
+#It is possible to indicate the similarity of the shape of distributionfor factor levels 'F' (female) and 'M' (male), so maybe it will be possible to redefine feature 'Sex' on infant-adult(will include male and female).
+To answer this question we can calculate the standard deviation of Length and Whole Weight (feature witch have the strongest correlation with the number of rings) for whole dataset, male, female, adults(male and female) and for infants to compare the dispersion of values in those subsets.
+
+
+
+import pandas as pd
+
+#Load the data from the CSV file
+DFabalone = pd.read_csv(r'C:\Users\38098\Documents\abalone\abalone_updated.csv',
+                                              names=['Sex','Length','Diameter',
+                                             'Height','Whole Weight','Shucked Weight',
+                                             'Viscera Weight','Shell WEight','Rings'])
+# Compute the standart deviation for all observation to have some start point                                              
+all_stdL = DFabalone.loc[:,'Length'].std()
+all_stdWW = DFabalone.loc[:,'Whole Weight'].std()
+
+# Create a boolean variable that returns True if 'Sex' = 'M'
+is_male = DFabalone['Sex']=='M'
+
+# Create subset for males
+DF_M_abalone = DFabalone[is_male]
+m_stdL = DF_M_abalone.loc[:,'Length'].std()
+m_stdWW = DF_M_abalone.loc[:,'Whole Weight'].std()
+
+# Create a boolean variable that returns True if 'Sex' = 'F'
+is_female = DFabalone['Sex']=='F' 
+
+# Create subset for females
+DF_F_abalone = DFabalone[is_female]
+f_stdL = DF_F_abalone.loc[:,'Length'].std()
+f_stdWW = DF_F_abalone.loc[:,'Whole Weight'].std()
+
+# Create a boolean variable that returns True if 'Sex' = 'I'
+is_infant = DFabalone['Sex']=='I' 
+
+# Create subset for infants
+DF_I_abalone = DFabalone[is_infant]
+i_stdL = DF_I_abalone.loc[:,'Length'].std()
+i_stdWW = DF_I_abalone.loc[:,'Whole Weight'].std()
+
+# Create a boolean variable that returns True if 'Sex' != 'I'
+is_adult = DFabalone['Sex']!='I'
+# Create subset for adults
+DF_adult_abalone = DFabalone[is_adult]
+ad_stdL = DF_adult_abalone.loc[:,'Length'].std()
+ad_stdWW = DF_adult_abalone.loc[:,'Whole Weight'].std()
+
+#Create a data frame to visualize the results
+DFstd = pd.DataFrame({
+    'All': (all_stdL, all_stdWW),
+    'M+F': (ad_stdL, ad_stdWW),
+    'M': (m_stdL, m_stdWW),
+    'F': (f_stdL, f_stdWW),
+    'I': (i_stdL, i_stdWW)
+})	
+  
+ DFstd
+ 
+ Output:
+   All	    M+F	      M	        F	        I
+0	0.117670	0.094533	0.101119	0.085399	0.106855
+1	0.488435	0.451346	0.468416	0.429141	0.286583
+
+# As we can see, the subset F is more homogenous than the M+F subset. Even though we can not say the same about M and F+M subsets, probably it will be better to stick to the classification enforced be the data.
+# The redefining of sex feature woulf simplify the interpretation of it by algorithm ( it could be 0 for Infant and 1 for adult), but since primary classification wil be saved, 'Sex' feature should be presented for the learning algorithm as a dummy value
+
+DFabalone['Male']=(DFabalone['Sex']=='M').astype(int)
+DFabalone['Female']=(DFabalone['Sex']=='F').astype(int)
+DFabalone['Infant']=(DFabalone['Sex']=='I').astype(int)
+
 

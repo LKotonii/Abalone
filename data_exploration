@@ -94,4 +94,7 @@ DFabalone['Male']=(DFabalone['Sex']=='M').astype(int)
 DFabalone['Female']=(DFabalone['Sex']=='F').astype(int)
 DFabalone['Infant']=(DFabalone['Sex']=='I').astype(int)
 
+# The target value is Rings/1.5 (it rougly corresponds to abalone's age), so the 'Rings' column should be updated
+DFabalone['Rings'] = DFabalone['Rings']/1.5
+DFabalone['Rings'].name = 'Target'
 

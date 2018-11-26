@@ -1,7 +1,84 @@
+
+# Linear Regression. 
+# Linear regression is one of the most known and studied alrorithm of machine learning. It assums linear relationship between thw input variables and the single output variable(which is to be predicted)
+# On this dataset will be implemented Multiple Linear Regression because we have more that 1 input variable
+# The linear equation assigns one scale factor to each input value or column, called a coefficient; one additional coefficient is also added, giving the line an additional degree of freedom
+# In a simple regression problem the form of model would be: y = b + ax, where y - is our value to be predicted, b - additional coefficient which allows moving the line up/down in 2-dimensional plot, x - input value, b - coefficient mentioned above.
+# In higher dimensions the line is called hyper plane and the representation is the form of the equation and the specific values used for the coefficients
+# Learning techniques is used to find a good set of coefficient values. For several inputs we could use Ordinary Least Squares to estimate the values of the coefficients(the algorithm is trying to minimize the sum of squared distance between each data point and the regression line)
+# Other learning technique to be used multidimension dataset is Gradient Decent(it starts with random values for each coefficient and calculate the sum of squared errors for each pair of inout and output values). Using this method we should select a learning rate used as a scale factor for minimizing the error
+
+
+
 # Quick linearity check using scatter diagrams
 from matplotlib import pyplot as plt
 
-plt.scatter(DFabalone['Length'], DFabalone['Rings'])
+# For the 'Length'
+plt.scatter(DFabalone['Length'], DFabalone['Target'])
 plt.xlabel('Length')
-plt.ylabel('Rings')
+plt.ylabel('Target')
 plt.grid(True)
+
+# For the 'Whole Weight'
+plt.scatter(DFabalone['Whole Weight'], DFabalone['Target'])
+plt.xlabel('Diameter')
+plt.ylabel('Target')
+plt.grid(True)
+
+# For the Height
+plt.scatter(DFabalone['Height'], DFabalone['Target'])
+plt.xlabel('Height')
+plt.ylabel('Target')
+plt.grid(True)
+
+# In the first 2 cases the data is not perfect for the linear regression, but the Height-Rings correlation is a good fit for the linear model
+
+# Split the dataset on train and test sets
+
+from sklearn import linear_model as lnm
+from sklearn.model_selection import train_test_split as tts
+
+train, test = tts(DFabalone, train_size = 0.8, test_size = 0.2)
+data_train = train.drop(['Target', 'Sex'], axis = 1)
+target_train = train['Target']
+data_test = test.drop(['Target', 'Sex'], axis = 1)
+target_test = test['Target']
+
+# Create the model 
+lin_model = lnm.LinearRegression()
+model = lin_model.fit(data_train, target_train)
+
+# Check the accuracy score
+model.score(data_train, target_train)
+# Output is : 0.5274309454391728 which is not amazing, but probably could be improved in later steps
+
+#Check the mean absolutr error
+m_absolute_error = mean_absolute_error(target_test, target_pred
+print(m_absolute_error)
+# Output:1.064155058038642
+
+
+# Random Forest
+# The second ML technique used for age prediction of the abalone will be Random Forest. It's a flexible algorithm, ensemble learning method where group of a weak models combine to a powerful instrument.
+# The "forest" is multiples decision trees merged together to get more accurate and stable prediction. It has same hyperparameters as a decision tree and adds additional randomness to the model, while growing the trees.
+# Decision tree identifies the most significant variable(before each node split) that give the most homogenous sets of population, then algorithm divide the predictor space into distinct non-overlaping regions. 
+# Instead of searching for the most important feature while splitting node, random forest searches for the best features among a random subset of features. This result in a wide diversity, hence in a  better model.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

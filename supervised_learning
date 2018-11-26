@@ -1,0 +1,7 @@
+# Quick linearity check using scatter diagrams
+from matplotlib import pyplot as plt
+
+plt.scatter(DFabalone['Length'], DFabalone['Rings'])
+plt.xlabel('Length')
+plt.ylabel('Rings')
+plt.grid(True)

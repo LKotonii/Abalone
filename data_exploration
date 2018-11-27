@@ -32,8 +32,7 @@ To answer this question we can calculate the standard deviation of Length and Wh
 import pandas as pd
 
 #Load the data from the CSV file
-DFabalone = pd.read_csv(r'C:\Users\38098\Documents\abalone\abalone_updated.csv',
-                                              names=['Sex','Length','Diameter',
+DFabalone = pd.read_csv(r'abalone_updated.csv', names=['Sex','Length','Diameter',
                                              'Height','Whole Weight','Shucked Weight',
                                              'Viscera Weight','Shell WEight','Rings'])
 # Compute the standart deviation for all observation to have some start point                                              

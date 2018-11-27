@@ -33,7 +33,7 @@ plt.grid(True)
 
 # In the first 2 cases the data is not perfect for the linear regression, but the Height-Rings correlation is a good fit for the linear model
 
-# Split the dataset on train and test sets
+# Split the dataset on train and test sets (those sets will be the same for both learning techniques)
 
 from sklearn import linear_model as lnm
 from sklearn.model_selection import train_test_split as tts
@@ -52,11 +52,15 @@ model = lin_model.fit(data_train, target_train)
 model.score(data_train, target_train)
 # Output is : 0.5274309454391728 which is not amazing, but probably could be improved in later steps
 
-#Check the mean absolutr error
-m_absolute_error = mean_absolute_error(target_test, target_pred
+# Check the mean absolute error
+from sklearn.metrics import mean_absolute_error
+# Predict the target value for the
+target_pred = lin_model.predict(data_test)
+m_absolute_error = mean_absolute_error(target_test, target_pred)
 print(m_absolute_error)
 # Output:1.064155058038642
 
+##########################################################################################
 
 # Random Forest
 # The second ML technique used for age prediction of the abalone will be Random Forest. It's a flexible algorithm, ensemble learning method where group of a weak models combine to a powerful instrument.
@@ -64,13 +68,24 @@ print(m_absolute_error)
 # Decision tree identifies the most significant variable(before each node split) that give the most homogenous sets of population, then algorithm divide the predictor space into distinct non-overlaping regions. 
 # Instead of searching for the most important feature while splitting node, random forest searches for the best features among a random subset of features. This result in a wide diversity, hence in a  better model.
 
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error
 
 
+# Create the model and fit data
+# n_estimators=200 by default, it sometimes better to define max_depth of the trees while declaration the model to avoid creating full developped trees
+forest = RandomForestRegressor(n_estimators=200, max_depth=8,max_features='auto')
+model = forest.fit(data_train, target_train)
 
+target_pred = model.predict(data_test)
 
+# Check accuracy and MAE for the model
+print("Score " + str(model.score(data_test, target_test)))
+m_absolute_error = mean_absolute_error(target_test, target_pred)
+print("Mean Absolute Error "+str(m_absolute_error))
 
-
-
+# Output: Score 0.5841479132710579
+#          Mean Absolute Error 0.9892184439884893
 
 
 

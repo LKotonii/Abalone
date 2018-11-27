@@ -146,14 +146,36 @@ print ('Folds: %i, mean absolute error: %.2f std: %.2f'
 
 # Create a model with tuned hyperparameters 
 
+forest_improved = RandomForestRegressor(n_estimators=800,min_samples_split=10,min_samples_leaf=4, max_depth=10,max_features='auto')
+
+# Inputs from the start dataset
+model_improved = forest_improved.fit(data_train, target_train)
+print("Score " + str(model_improved.score(data_test, target_test)))
+m_absolute_error = mean_absolute_error(target_test, target_pred)
+print("Mean Absolute Error "+str(m_absolute_error))
+
+# Output: Score 0.5857659026577373
+#         Mean Absolute Error 1.1764670016916652
 
 
+# Inputs : dataset after using RFE
+model_improved_rfe = forest_improved.fit(train_rfe_set, target_train)
+print("Score " + str(model_improvedrfe.score(test_rfe_set, target_test)))
+m_absolute_error = mean_absolute_error(target_test, predict_rfe)
+print("Mean Absolute Error "+str(m_absolute_error))
+# Output:  Score 0.5791444787990044
+#          Mean Absolute Error 1.004197400066996
+
+# Inputs : dataset after using PCA
+model_improved_pca = forest_improved.fit(train_pca_set, target_train)
+print("Score " + str(model_improved_pca.score(test_pca_set, target_test)))
+m_absolute_error = mean_absolute_error(target_test, predict_pca)
+print("Mean Absolute Error "+str(m_absolute_error))
+# Output: Score 0.603901315253319
+#         Mean Absolute Error 0.954501914273496 
 
 
-
-
-
-
+## The man absolute value hac decreased , which is a good result, but the accuracy did not increase significantly, probably the model still need some hyperparameter tuning
 
 
 

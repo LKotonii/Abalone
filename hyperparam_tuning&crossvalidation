@@ -1,1 +1,159 @@
+# Hyperparameters - parameters whose value should be set before the learning process begins; expression of "high level" properties of the model tht can not be lernaed from the regular training process
+# Cross Validation is very similar to train/test splt method, but it's applied to more subsets (to randomize the split and improve accuracy)
+# To perform cross validation data set should be divided into k subsrts, and ML algorithm shoukd be trained on k-1 subsets(during the 1 iteration 1 subset will be saved for testin, second iteration - second subset, ext. ) In this way we can achieve better managemant of a data because each of the data point will be presented in train set and in the test set
+
+######### Linear model #####
+# Gradient descent its a optimisation method used for minimization of overal loss.
+# The result of a gradient computation represents a slope of the cost function at a given point. To optimize weights we must subtract the product from learning rate and a gradient result from them.
+
+# Define Batch Gradient Decent
+def batch_gradient_descent(X, Y, learning_rate, n_iter):
+    weights = np.zeros(X.shape[1])
+    
+    history = []
+    m = len(Y)
+    
+    predict = lambda x: np.dot(x, weights)
+    derivative = lambda loss: (X.T.dot(loss)) / m
+    
+    for i in range(n_iter):
+        hypothesis = predict(X)
+        loss = hypothesis - Y  
+        weights = weights - learning_rate * derivative(loss)
+        
+        if i % 50 == 0:
+            history.append(mean_absolute_error(X.dot(weights), Y))
+
+    return predict, history
+# Batch Gradient Decent will run each possible combination of hyperparameters and compare them in multiple ways
+
+# Pick up the hyperparameters for test
+lrates = [.5, .1, .01, .001, .0001]
+niterations = [25000, 50000, 150000]
+
+#  test function iterates over each hyperparameter and put all the results in a record list
+def test(X, y):
+    record = []
+    
+    for niter in niterations:
+        for lrate in lrates:
+            weigths, records = batch_gradient_descent(X, y, lrate, niter)
+           
+            record.append(dict(lrate=lrate, niter=niter, w=weigths, history=records))
+            return record
+            
+ predictor, history = batch_gradient_descent( data_train, target_train, 0.05, 50000)
+ plt.plot(history)
+ rec = test(data_train, target_train)
+ plt.plot(rec)
+ # It is possible to observe some plots  that have almost 90-degree line(their hyperparameters of batch_gradient_descent converge faster) while another is a smooth curve
+ 
+ # Cross Validation (KFolds)
+ 
+from sklearn.model_selection import cross_val_score, KFold
+
+X = DFabalone1.drop(['Sex', 'Target'], axis=1)
+Y = DFabalone1['Target']
+
+cv = KFold(n_splits=10, shuffle=True)
+score = cross_val_score(lin_model, X, Y,scoring='neg_mean_absolute_error', cv = cv)
+print ('Folds: %i, mean absolute error: %.2f std: %.2f'
+ %(len(score),np.mean(np.abs(score)),np.std(score)))
+# Output:    Folds: 10, mean absolute error: 1.59 std: 0.08 
+# Standard deviation of the score for each oteration of the KFold is quite small(0.08), so it will be hard to achieve some significant improvement of the accuracy or reduce the error using Linear Regression algorithm 
+ 
+ #############    Random Forest ############
+ 
+ # Random hyperpararmeter grid
+
+
+from sklearn.model_selection import RandomizedSearchCV
+
+# Defining the range of values
+
+# Number of trees in random forest
+n_estimators = [int(x) for x in np.linspace(start = 200, stop = 800, num = 10)]
+
+# Number of features to consider at every split
+max_features = ['auto', 'sqrt']
+
+# Maximum number of levels in tree
+max_depth = [int(x) for x in range(1,11)]
+max_depth.append(None)
+
+# Minimum number of samples required to split a node
+min_samples_split = [2, 5, 10]
+
+# Minimum number of samples required at each leaf node
+min_samples_leaf = [1, 2, 4]
+
+# Method of selecting samples for training each tree
+bootstrap = [True, False]
+
+# Create the random grid
+random_grid = {'n_estimators': n_estimators,
+               'max_features': max_features,
+               'max_depth': max_depth,
+               'min_samples_split': min_samples_split,
+               'min_samples_leaf': min_samples_leaf,
+               'bootstrap': bootstrap}
+print(random_grid)
+# Output: {'n_estimators': [200, 266, 333, 400, 466, 533, 600, 666, 733, 800], 'max_features': ['auto', 'sqrt'], 'max_depth': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, None], 'min_samples_split': [2, 5, 10], 'min_samples_leaf': [1, 2, 4], 'bootstrap': [True, False]}
+ 
+# Use the random grid to search for the best hyperparameters
+model_random = RandomizedSearchCV(cv = 5, estimator = forest, param_distributions = random_grid, n_iter = 500)
+model_random.fit(data_train, target_train)
+
+# Best found hyperparameters
+model_random.best_params_
+# Output: {'n_estimators': 800,'min_samples_split': 10,'min_samples_leaf': 4,'max_features': 'auto','max_depth': 10,'bootstrap': True}
+ 
+# Evaluate random search to analyze the improvement in the LM from the tuning hyperparameters
+def evaluate(model, test_data, test_target):
+    
+    predictions = model.predict(test_data)
+    errors = abs(predictions - test_target)
+    mape = 100 * np.mean(errors / test_target)
+    accuracy = 100 - mape
+    print('Average Error: {:0.4f} degrees.'.format(np.mean(errors)))
+    print('Accuracy = {:0.2f}%.'.format(accuracy))
+    
+    return accuracy
+
+# Compare the Random Search model to base model
+
+base_model = forest
+base_model.fit(data_train, target_train)
+base_accuracy = evaluate(base_model, data_test, target_test)
+
+best_random = model_random.best_estimator_
+random_accuracy = evaluate(best_random, data_test, target_test)
+
+print('Improvement of {:0.2f}%.'.format( 100 * (random_accuracy - base_accuracy) / base_accuracy))
+
+# Cross validation 
+from sklearn.model_selection import cross_val_score, KFold
+
+X = DFabalone.drop(['Sex', 'Target'], axis=1)
+Y = DFabalone['Target']
+
+cv = KFold(n_splits=10, shuffle=True)
+
+score = cross_val_score(forest, X, Y,scoring='neg_mean_absolute_error', cv = cv)
+print ('Folds: %i, mean absolute error: %.2f std: %.2f'
+ %(len(score),np.mean(np.abs(score)),np.std(score)))
+
+
+# Create a model with tuned hyperparameters 
+
+
+
+
+
+
+
+
+
+
+
 

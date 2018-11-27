@@ -85,7 +85,7 @@ m_absolute_error = mean_absolute_error(target_test, target_pred)
 print("Mean Absolute Error "+str(m_absolute_error))
 
 # Output: Score 0.5841479132710579
-#          Mean Absolute Error 0.9892184439884893
+#          Mean Absolute Error 1.1758439711899553
 
 
 

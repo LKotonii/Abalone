@@ -1,4 +1,4 @@
- # Dimensionality reduction it's a process of reducion the number of input variables to find maximally informative subset of data. That algorithm are very useful because simple dataset (low dimensional) is easier to interprete by ML algorihm
+ # Dimensionality reduction it's a process which goal is to reduce the number of input variables to find maximally informative subset of data. That algorithm are very useful because simple dataset (low dimensional) is easier to interprete by ML algorihm
  # There are two components of dimensionality reduction: 
  #                               1) Feature selection( in this, we try to find a subset of the original set of variables, or features, to get a smaller subset which can be used to model the problem. It usually involves three ways :Filter, Wrapper, Embeded.
  #                               2) Feature extraction: This reduces the data in a high dimensional space to a lower dimension space.

@@ -1,1 +1,115 @@
+ # Dimensionality reduction it's a process of reducion the number of input variables to find maximally informative subset of data. That algorithm are very useful because simple dataset (low dimensional) is easier to interprete by ML algorihm
+ # There are two components of dimensionality reduction: 
+ #                               1) Feature selection( in this, we try to find a subset of the original set of variables, or features, to get a smaller subset which can be used to model the problem. It usually involves three ways :Filter, Wrapper, Embeded.
+ #                               2) Feature extraction: This reduces the data in a high dimensional space to a lower dimension space.
+
+ # To start with dimensionality reduction, we could do the most obvious thing : eliminate features that have strong linear correlation(Shucked Weight, Viscera Weight, Shell Weight)
  
+   
+# Split the data on train and testing sets
+# Change the random_state values that have a big impact on the accuracy scores
+train, test = tts(DFabalone, train_size = 0.8, test_size = 0.2, random_state=6)
+dim_red_Xtrain = train.drop(['Target', 'Sex', 'Shucked Weight',
+                            'Viscera Weight','Shell Weight'], axis = 1)  # 'Sex' feature also was eliminated because it was redefined as dummy variable
+dim_red_Ytrain = train['Target']
+
+dim_red_Xtest = test.drop(['Target', 'Sex', 'Shucked Weight','Viscera Weight','Shell Weight'], axis = 1)
+dim_red_Ytest = test['Target']
+
+   ####### Random Forest model #######
+model_dm = forest.fit(dim_red_Xtrain, dim_red_Ytrain)
+target_pred = model_dm.predict(dim_red_Xtest)
+
+print("Score " + str (model_dm.score(dim_red_Xtest, dim_red_Ytest)))
+print ("Mean Absolute Error after feature elimination "+ str(mean_absolute_error(dim_red_Ytest, target_pred)))
+# Output : Score 0.42129293954596103
+#          Mean Absolute Error after feature elimination 1.1774058819601654
+# Accuracy even lower than in base model 
+
+
+#Using PCA for dimensionality reduction involves zeroing out one or more of the smallest principal components, resulting in a lower-dimensional projection of the data that preserves the maximal data variance.
+from sklearn.decomposition import PCA
+
+pca = PCA(n_components=6, svd_solver='randomized')
+
+pca.fit(data_train)
+
+train_pca_set = pca.transform(data_train)
+test_pca_set = pca.transform(data_test)
+
+model_pca = forest.fit(train_pca_set, target_train)
+predict_pca = model_pca.predict(test_pca_set)
+
+print ('Score after PCA: ' + str(model_pca.score(test_pca_set, target_test)))
+print ("Mean absolute error: " +str(mean_absolute_error(target_test, predict_pca)))
+
+# Output: Score after PCA: 0.6046280377802331
+          Mean absolute error: 0.959467025820805
+          
+# The Recursive Feature Elimination works by recursively removing attributes and building a model on those attributes that remain.
+# It uses the model accuracy to identify which attributes (and combination of attributes) contribute the most to predicting the target attribute.
+from sklearn.feature_selection import RFE
+
+rfe = RFE(forest, 6)
+rfe.fit(data_train, target_train)
+
+train_rfe_set = rfe.transform(data_train)
+test_rfe_set = rfe.transform(data_test)
+
+model_rfe = forest.fit(train_rfe_set, target_train)
+predict_rfe = model_rfe.predict(test_rfe_set)
+
+print ('Score after RFE: ' + str(model_rfe.score(test_rfe_set, target_test)))
+print ("Mean absolute error: " +str(mean_absolute_error(target_test, predict_rfe)
+
+#Output: Score after RFE: 0.5776170696123654
+#        Mean absolute error: 1.0049262406338804
+
+# Both algorithms( PCA and RFE) seems to improve the accuracy and reduced MAE
+
+######## Linear Regression #######
+model = lin_model.fit(dim_red_Xtrain,dim_red_Ytrain)
+predictions = lin_model.predict(dim_red_Xtest)
+
+print("Score " + str (lin_model_dmr.score(dim_red_Xtest, dim_red_Ytest)))
+print ("Mean Absolute Error: "+ str(mean_absolute_error(dim_red_Ytest, target_pred)))
+# Output: Score 0.39992735580600214
+#             Mean Absolute Error: 1.5538115873961889
+# The accuracy is lower than in base_model, MAE is practically the same
+
+# PCA
+from sklearn.decomposition import PCA
+
+pca = PCA(n_components=6, svd_solver='randomized')
+
+pca.fit(data_train)
+
+train_pca_set = pca.transform(data_train)
+test_pca_set = pca.transform(data_test)
+
+model_pca = lin_model.fit(train_pca_set, target_train)
+predict_pca = model_pca.predict(test_pca_set)
+
+print ('Score after PCA: ' + str(model_pca.score(test_pca_set, target_test)))
+print ("Mean absolute error: " +str(mean_absolute_error(target_test, predict_pca)))
+
+# Output: Score after PCA: 0.54032604319358
+#         Mean absolute error: 1.5778854281878798
+
+
+# RFE
+rfe = RFE(lin_model, 6)
+rfe.fit(data_train, target_train)
+
+train_rfe_set = rfe.transform(data_train)
+test_rfe_set = rfe.transform(data_test)
+
+model_rfe = lin_model.fit(train_rfe_set, target_train)
+predict_rfe = model_rfe.predict(test_rfe_set)
+
+print ('Score after RFE: ' + str(lin_model.score(test_rfe_set, target_test)))
+print ("Mean absolute error: " +str(mean_absolute_error(target_test, predict_rfe)))
+# Output: Score after RFE: 0.5432471969372357
+#         Mean absolute error: 1.5907880070728593
+
+
